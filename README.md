@@ -2,49 +2,81 @@
 
 # Lunara for iOS
 
-**An AMOLED true-black music player for iOS, built in SwiftUI.**
+### A modern music player built in SwiftUI
 
-![Platform](https://img.shields.io/badge/platform-iOS%2017%2B-1DB954)
-![UI](https://img.shields.io/badge/UI-SwiftUI-1DB954)
-[![License](https://img.shields.io/badge/license-GPL--3.0-1DB954.svg)](LICENSE)
+Stream, download, and play local audio with word-by-word synced lyrics
+and a multi-band equalizer.
+
+<br />
+
+[![Platform](https://img.shields.io/badge/Platform-iOS_17%2B-27CE65?style=flat-square&logo=apple&logoColor=white&labelColor=08A858)](#building)
+[![Swift](https://img.shields.io/badge/Language-Swift-27CE65?style=flat-square&logo=swift&logoColor=white&labelColor=08A858)](#technology)
+[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-27CE65?style=flat-square&logo=swift&logoColor=white&labelColor=08A858)](#technology)
+[![XcodeGen](https://img.shields.io/badge/Project-XcodeGen-27CE65?style=flat-square&logo=xcode&logoColor=white&labelColor=08A858)](project.yml)
+[![License](https://img.shields.io/badge/License-GPL--3.0-27CE65?style=flat-square&logo=gnu&logoColor=white&labelColor=08A858)](LICENSE)
+
+[![Codemagic](https://img.shields.io/badge/CI-Codemagic-27CE65?style=flat-square&logo=codemagic&logoColor=white&labelColor=08A858)](codemagic.yaml)
+[![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-27CE65?style=flat-square&logo=githubactions&logoColor=white&labelColor=08A858)](.github/workflows/release-ipa.yml)
+[![Distribution](https://img.shields.io/badge/Distribution-TestFlight_|_Sideload-27CE65?style=flat-square&logo=testflight&logoColor=white&labelColor=08A858)](#distribution)
+
+<br />
+
+[Overview](#overview) &nbsp;|&nbsp; [Features](#features) &nbsp;|&nbsp; [Building](#building) &nbsp;|&nbsp; [Distribution](#distribution) &nbsp;|&nbsp; [Technology](#technology)
 
 </div>
 
 ---
 
-## Overview
+## Table of Contents
 
-Lunara streams music seamlessly, plays local audio files on your phone, tracks synced lyrics with word-by-word highlighting, and features an AMOLED true-black interface with emerald green accents.
+- [Overview](#overview)
+- [Features](#features)
+- [Building](#building)
+- [Distribution](#distribution)
+- [Technology](#technology)
+- [License](#license)
+- [Author](#author)
 
 ---
+
+## Overview
+
+Lunara streams music seamlessly, plays local audio files on your phone, and tracks synced lyrics with word-by-word highlighting.
 
 ## Features
 
-### Playback & Audio
-- **Streaming**: Search and browse songs, albums, artists, mood stations, and playlists
-- **Local Music**: Import audio from Files and play alongside streamed tracks
-- **Downloads & Audio Cache**: Keep songs offline and cache streamed playback automatically
-- **Queue**: Reorder tracks, save queue as a playlist, or launch radio from any track
-- **Equalizer**: Multi-band DSP equalizer with presets
-- **Background Audio & Lock Screen**: Full media controls, sleep timer, and AirPlay support
-- **Stream Sources**: Select preferred playback stream clients and audio quality
+### Playback and Audio
+
+| Feature | Description |
+|---------|-------------|
+| **Streaming** | Search and browse songs, albums, artists, mood stations, and playlists. |
+| **Local music** | Import audio from Files and play it alongside streamed tracks. |
+| **Downloads and audio cache** | Keep songs offline and cache streamed playback automatically. |
+| **Queue** | Reorder tracks, save the queue as a playlist, or launch radio from any track. |
+| **Equalizer** | Multi-band DSP equalizer with presets. |
+| **Background audio and lock screen** | Full media controls, sleep timer, and AirPlay support. |
+| **Stream sources** | Select preferred playback stream clients and audio quality. |
 
 ### Lyrics
-- **Synced Lyrics**: Word-by-word highlighting and TTML timing support
-- **Romanization & AI Translation**: Optional script romanization and translations
-- **Lyrics Cache**: Cached locally for offline reading
 
-### Library & Extras
-- **Local Library & Playlists**: Create and manage playlists, liked songs, and favorite artists on device
-- **Import from Spotify**: Match public Spotify playlists track by track into local playlists
-- **Share Playlists & Tracks**: Shareable artwork cards with scannable links
-- **Home Screen Widget & Siri Intents**: Quick playback widget and voice shortcuts
+| Feature | Description |
+|---------|-------------|
+| **Synced lyrics** | Word-by-word highlighting and TTML timing support. |
+| **Romanization and AI translation** | Optional script romanization and translations. |
+| **Lyrics cache** | Cached locally for offline reading. |
 
----
+### Library and Extras
+
+| Feature | Description |
+|---------|-------------|
+| **Local library and playlists** | Create and manage playlists, liked songs, and favorite artists on device. |
+| **Import from Spotify** | Match public Spotify playlists track by track into local playlists. |
+| **Share playlists and tracks** | Shareable artwork cards with scannable links. |
+| **Home Screen widget and Siri Intents** | Quick playback widget and voice shortcuts. |
 
 ## Building
 
-Generated with XcodeGen from [`project.yml`](project.yml) and configured for CI in [`codemagic.yaml`](codemagic.yaml) producing `LunaraPlayer.ipa`.
+The Xcode project is generated with [XcodeGen](https://github.com/yonaskolb/XcodeGen) from [`project.yml`](project.yml).
 
 ```bash
 brew install xcodegen
@@ -52,37 +84,82 @@ xcodegen generate
 open LunaraPlayer.xcodeproj
 ```
 
-Codemagic uses the `ios-release` workflow to create an App Store-signed IPA.
-Configure an `app_store_credentials` environment group with an App Store
-Connect API key and signing access before running it. The resulting build can
-be distributed through TestFlight or the App Store; an IPA alone cannot be
-installed on arbitrary iPhones without Apple distribution or TestFlight.
+### Project details
 
-The project can also build entirely in GitHub Actions from
-[`.github/workflows/release-ipa.yml`](.github/workflows/release-ipa.yml).
-Run it with **Actions > Build and Release Unsigned IPA > Run workflow** and
-provide the version and build number. It generates the Xcode project on a
-GitHub-hosted macOS runner, packages an unsigned IPA, and attaches it to a
-GitHub Release without requiring Apple Developer secrets.
-
-An unsigned IPA cannot be installed directly on an iPhone. For personal free
-use, download the release IPA and sign it with your own Apple ID using a
-sideloading tool such as AltStore, SideStore, or Sideloadly. Free Apple ID
-signing is limited by Apple, typically expiring after seven days, and recent
-iOS versions may require Developer Mode for development-signed apps. A paid
-Apple Developer membership is only needed for longer-lived TestFlight/App
-Store distribution.
-
-| | |
-|---|---|
+| Property | Value |
+|----------|-------|
 | **Language** | Swift |
 | **UI** | SwiftUI |
-| **Minimum** | iOS 17.0 |
-| **Project** | Generated by XcodeGen from `project.yml` |
+| **Minimum OS** | iOS 17.0 |
+| **Project generation** | XcodeGen from `project.yml` |
 | **Bundle ID** | `com.lunara.player` |
+| **Build output** | `LunaraPlayer.ipa` |
 
----
+## Distribution
+
+Two build pipelines are provided. Choose based on whether you have an Apple Developer membership.
+
+### Option 1: Codemagic (signed, App Store)
+
+[`codemagic.yaml`](codemagic.yaml) defines the `ios-release` workflow, which creates an App Store-signed IPA.
+
+1. Create an `app_store_credentials` environment group.
+2. Add an App Store Connect API key and signing access to it.
+3. Run the `ios-release` workflow.
+
+The resulting build can be distributed through TestFlight or the App Store.
+
+> [!NOTE]
+> An IPA alone cannot be installed on arbitrary iPhones without Apple distribution or TestFlight.
+
+### Option 2: GitHub Actions (unsigned, free)
+
+[`release-ipa.yml`](.github/workflows/release-ipa.yml) builds entirely on GitHub-hosted runners and needs no Apple Developer secrets.
+
+1. Open **Actions > Build and Release Unsigned IPA > Run workflow**.
+2. Provide the version and build number.
+3. The workflow generates the Xcode project on a macOS runner, packages an unsigned IPA, and attaches it to a GitHub Release.
+
+### Installing the unsigned IPA
+
+An unsigned IPA cannot be installed directly on an iPhone. For personal free use, download the release IPA and sign it with your own Apple ID using a sideloading tool.
+
+| Tool | Notes |
+|------|-------|
+| **AltStore** | Signs with your Apple ID and refreshes through a companion app. |
+| **SideStore** | On-device sideloading alternative. |
+| **Sideloadly** | Desktop-based signing and installation. |
+
+> [!IMPORTANT]
+> Free Apple ID signing is limited by Apple and typically expires after seven days. Recent iOS versions may require Developer Mode for development-signed apps. A paid Apple Developer membership is only needed for longer-lived TestFlight or App Store distribution.
+
+## Technology
+
+| Area | Choice |
+|------|--------|
+| Language | Swift |
+| UI framework | SwiftUI |
+| Project generation | XcodeGen |
+| Audio | Background playback, multi-band DSP equalizer, AirPlay |
+| Integrations | Siri Intents, Home Screen widget |
+| CI / CD | Codemagic, GitHub Actions |
 
 ## License
 
-Released under the **[GNU General Public License v3.0](LICENSE)**.
+Released under the [GNU General Public License v3.0](LICENSE).
+
+## Author
+
+Designed and developed by **Ankit**, a BSc CSIT student and full-stack developer based in Kathmandu, Nepal.
+
+[![GitHub](https://img.shields.io/badge/GitHub-ankitkhatrik6-27CE65?style=flat-square&logo=github&logoColor=white&labelColor=08A858)](https://github.com/ankitkhatrik6)
+[![Portfolio](https://img.shields.io/badge/Portfolio-ankitkhatri.me-27CE65?style=flat-square&logo=googlechrome&logoColor=white&labelColor=08A858)](https://ankitkhatri.me)
+[![Instagram](https://img.shields.io/badge/Instagram-21ank1t-27CE65?style=flat-square&logo=instagram&logoColor=white&labelColor=08A858)](https://instagram.com/21ank1t)
+
+---
+
+<div align="center">
+
+Built with SwiftUI.
+
+</div>
