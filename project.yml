@@ -62,7 +62,7 @@ targets:
     sources:
       - Widget
       - path: Sources/LunaraLink.swift
-      - path: Sources/Resources/lunara_logo_white.png
+      - path: Sources/Resources/icon.png
         buildPhase: resources
     info:
       path: Widget/Info.plist

@@ -524,15 +524,6 @@ struct GreetingCard: View {
                     .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
                 }
             }
-            .overlay(alignment: .bottomTrailing) {
-                Image(bundleImage: "lunara_hero")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 216)
-                    .shadow(color: .black.opacity(0.35), radius: 12, x: 0, y: 8)
-                    .offset(x: 8)
-                    .allowsHitTesting(false)
-            }
             .padding(.horizontal, 16)
             .padding(.top, 20)
             .padding(.bottom, 8)

@@ -29,7 +29,7 @@ struct SleeveHeader: View {
     var body: some View {
         HStack(spacing: size * 0.34) {
             ZStack {
-                Image("lunara_logo_white")
+                Image("icon")
                     .resizable()
                     .scaledToFit()
             }
