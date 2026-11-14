@@ -58,6 +58,22 @@ Connect API key and signing access before running it. The resulting build can
 be distributed through TestFlight or the App Store; an IPA alone cannot be
 installed on arbitrary iPhones without Apple distribution or TestFlight.
 
+The same build can run entirely in GitHub Actions from
+[`.github/workflows/release-ipa.yml`](.github/workflows/release-ipa.yml).
+Run it with **Actions > Build and Release IPA > Run workflow** and provide the
+version and build number. Add these repository secrets first:
+
+- `APPLE_TEAM_ID`
+- `IOS_DISTRIBUTION_CERTIFICATE_BASE64`
+- `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`
+- `IOS_KEYCHAIN_PASSWORD`
+- `IOS_APPSTORE_PROFILE_BASE64`
+- `IOS_WIDGET_APPSTORE_PROFILE_BASE64`
+
+The workflow generates the Xcode project on a GitHub-hosted macOS runner,
+exports the signed IPA, and attaches it to a GitHub Release. It does not build
+on the local machine.
+
 | | |
 |---|---|
 | **Language** | Swift |
