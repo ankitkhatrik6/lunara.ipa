@@ -21,6 +21,28 @@ extension View {
     func settingsMiniPlayer(_ player: Player) -> some View {
         modifier(SettingsMiniPlayer(player: player))
     }
+
+    func settingsCloseButton() -> some View {
+        modifier(SettingsCloseButton())
+    }
+}
+
+private struct SettingsCloseButton: ViewModifier {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.palette) private var palette
+
+    func body(content: Content) -> some View {
+        content.toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                }
+                .foregroundStyle(palette.accent)
+                .accessibilityLabel("Close")
+            }
+        }
+    }
 }
 
 // MARK: - Shared rows
@@ -172,5 +194,6 @@ struct SettingsPage<Content: View>: View {
         .background(palette.scaffold.ignoresSafeArea())
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
+        .settingsCloseButton()
     }
 }

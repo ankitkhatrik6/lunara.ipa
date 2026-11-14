@@ -33,6 +33,7 @@ struct StorageSettingsView: View {
         .background(palette.scaffold.ignoresSafeArea())
         .navigationTitle("Storage")
         .navigationBarTitleDisplayMode(.inline)
+        .settingsCloseButton()
         .task {
             downloads.refreshSize()
             cache.refreshSize()

@@ -120,6 +120,7 @@ struct LyricsSettingsView: View {
         .background(palette.scaffold.ignoresSafeArea())
         .navigationTitle("Lyrics")
         .navigationBarTitleDisplayMode(.inline)
+        .settingsCloseButton()
         .sheet(isPresented: $showProviders) {
             LyricsProviderSheet().environment(\.palette, palette)
         }

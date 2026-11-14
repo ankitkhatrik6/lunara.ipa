@@ -48,5 +48,6 @@ struct StreamSourcesView: View {
         .background(palette.scaffold.ignoresSafeArea())
         .navigationTitle("Stream sources")
         .navigationBarTitleDisplayMode(.inline)
+        .settingsCloseButton()
     }
 }

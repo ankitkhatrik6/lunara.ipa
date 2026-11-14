@@ -14,6 +14,7 @@ struct SettingsView: View {
     @State private var showStreams = false
     @State private var showContent = false
     @State private var showEqualizer = false
+    @State private var showAbout = false
 
     private struct Row: Identifiable {
         let id = UUID()
@@ -21,7 +22,7 @@ struct SettingsView: View {
         let title: String
         let subtitle: String
         var action: Action
-        enum Action { case player, equalizer, streams, content, lyrics, storage }
+        enum Action { case player, equalizer, streams, content, lyrics, storage, about }
     }
 
     private struct Group: Identifiable {
@@ -55,6 +56,11 @@ struct SettingsView: View {
                 Row(icon: "internaldrive", title: "Storage",
                     subtitle: "Cache, downloads, clear data",
                     action: .storage),
+            ]),
+            Group(title: "Lunara", rows: [
+                Row(icon: "info.circle", title: "About Lunara",
+                    subtitle: "The story, principles, and people behind the player",
+                    action: .about),
             ]),
         ]
     }
@@ -160,6 +166,11 @@ struct SettingsView: View {
                 .preferredColorScheme(theme.preferredColorScheme)
                 .environment(\.palette, Palette(dark: theme.resolvedDark))
         }
+        .sheet(isPresented: $showAbout) {
+            NavigationStack { AboutLunaraView() }
+                .preferredColorScheme(theme.preferredColorScheme)
+                .environment(\.palette, Palette(dark: theme.resolvedDark))
+        }
     }
 
     // MARK: Search
@@ -249,6 +260,7 @@ struct SettingsView: View {
             case .content: showContent = true
             case .lyrics: showLyrics = true
             case .storage: showStorage = true
+            case .about: showAbout = true
             }
         } label: {
             HStack(spacing: 14) {
@@ -275,5 +287,82 @@ struct SettingsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct AboutLunaraView: View {
+    @Environment(\.palette) private var palette
+
+    var body: some View {
+        SettingsPage(title: "About Lunara") {
+            VStack(spacing: 14) {
+                Image(bundleImage: "icon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 92, height: 92)
+
+                Text("Lunara for iOS")
+                    .font(.lunara(24, .bold))
+                    .foregroundStyle(palette.onSurface)
+
+                Text("A focused music player for discovery, playback, lyrics, and your local library.")
+                    .font(.lunara(14))
+                    .foregroundStyle(palette.onSurfaceVariant)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 8)
+
+            SettingsGroup(title: "What Lunara is") {
+                aboutText("Lunara brings streaming discovery, background playback, synchronized lyrics, downloads, local music, playlists, equalizer controls, and a home screen widget together in one calm, personal listening space.")
+                SettingsDivider()
+                aboutText("The app is designed to feel fast and tactile while keeping your library, preferences, playback history, and cached content on your device.")
+            }
+
+            SettingsGroup(title: "Built with care") {
+                aboutText("Lunara is developed by Ankit Khatri KC with SwiftUI for iOS. The project is shaped around thoughtful interaction design, reliable playback, accessible controls, and a clear visual identity.")
+                SettingsDivider()
+                aboutText("Lunara is an independent project and is not affiliated with Apple, YouTube, Spotify, or any of the services it can connect to.")
+            }
+
+            SettingsGroup(title: "Version") {
+                HStack {
+                    SettingsIcon("app.badge")
+                    Text("Lunara for iOS")
+                        .font(.lunara(15, .medium))
+                        .foregroundStyle(palette.onSurface)
+                    Spacer()
+                    Text(version)
+                        .font(.lunara(13, .semibold))
+                        .foregroundStyle(palette.accent)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+
+            Text("Thank you for listening with Lunara.")
+                .font(.lunara(13, .medium))
+                .foregroundStyle(palette.onSurfaceVariant)
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
+                .padding(.top, 2)
+        }
+    }
+
+    private var version: String {
+        let info = Bundle.main.infoDictionary
+        let number = info?["CFBundleShortVersionString"] as? String ?? "0.5.1"
+        let build = info?["CFBundleVersion"] as? String ?? "6"
+        return "\(number) (\(build))"
+    }
+
+    private func aboutText(_ text: String) -> some View {
+        Text(text)
+            .font(.lunara(13))
+            .foregroundStyle(palette.onSurfaceVariant)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
     }
 }
