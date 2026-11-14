@@ -56,7 +56,7 @@ struct QuickPicksGrid: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: rows, spacing: 12) {
-                    ForEach(indexedItems, id: \.index) { indexedItem in
+                    ForEach(indexedItems, id: \.index, content: { indexedItem in
                         let index = indexedItem.index
                         let item = indexedItem.item
                         let track = item.asTrack
@@ -71,7 +71,7 @@ struct QuickPicksGrid: View {
                             SongRowMenu(track: track, player: player, trailingPadding: 2)
                         }
                         .frame(width: 280, alignment: .leading)
-                    }
+                    })
                 }
                 .padding(.horizontal, 16)
             }
