@@ -57,7 +57,7 @@ struct QuickPicksGrid: View {
                             }
                             .buttonStyle(.plain)
 
-                            SongRowMenu(track: track, player: player, trailingPadding: 2)
+                            SongRowMenu(track: track, player: player)
                         }
                         .frame(width: 280, alignment: .leading)
                     }
