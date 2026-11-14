@@ -39,6 +39,30 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate --spec project.yml
 
+      - name: Validate signing secrets
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+          APP_PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROFILE_BASE64 }}
+          WIDGET_PROFILE_BASE64: ${{ secrets.IOS_WIDGET_APPSTORE_PROFILE_BASE64 }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "$CERTIFICATE_BASE64" ]] || missing+=(IOS_DISTRIBUTION_CERTIFICATE_BASE64)
+          [[ -n "$CERTIFICATE_PASSWORD" ]] || missing+=(IOS_DISTRIBUTION_CERTIFICATE_PASSWORD)
+          [[ -n "$KEYCHAIN_PASSWORD" ]] || missing+=(IOS_KEYCHAIN_PASSWORD)
+          [[ -n "$APP_PROFILE_BASE64" ]] || missing+=(IOS_APPSTORE_PROFILE_BASE64)
+          [[ -n "$WIDGET_PROFILE_BASE64" ]] || missing+=(IOS_WIDGET_APPSTORE_PROFILE_BASE64)
+          [[ -n "$TEAM_ID" ]] || missing+=(APPLE_TEAM_ID)
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Missing required GitHub Actions secrets: ${missing[*]}"
+            echo "Add the secrets listed in README.md under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
       - name: Import signing certificate
         env:
           CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
