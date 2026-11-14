@@ -58,21 +58,20 @@ Connect API key and signing access before running it. The resulting build can
 be distributed through TestFlight or the App Store; an IPA alone cannot be
 installed on arbitrary iPhones without Apple distribution or TestFlight.
 
-The same build can run entirely in GitHub Actions from
+The project can also build entirely in GitHub Actions from
 [`.github/workflows/release-ipa.yml`](.github/workflows/release-ipa.yml).
-Run it with **Actions > Build and Release IPA > Run workflow** and provide the
-version and build number. Add these repository secrets first:
+Run it with **Actions > Build and Release Unsigned IPA > Run workflow** and
+provide the version and build number. It generates the Xcode project on a
+GitHub-hosted macOS runner, packages an unsigned IPA, and attaches it to a
+GitHub Release without requiring Apple Developer secrets.
 
-- `APPLE_TEAM_ID`
-- `IOS_DISTRIBUTION_CERTIFICATE_BASE64`
-- `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`
-- `IOS_KEYCHAIN_PASSWORD`
-- `IOS_APPSTORE_PROFILE_BASE64`
-- `IOS_WIDGET_APPSTORE_PROFILE_BASE64`
-
-The workflow generates the Xcode project on a GitHub-hosted macOS runner,
-exports the signed IPA, and attaches it to a GitHub Release. It does not build
-on the local machine.
+An unsigned IPA cannot be installed directly on an iPhone. For personal free
+use, download the release IPA and sign it with your own Apple ID using a
+sideloading tool such as AltStore, SideStore, or Sideloadly. Free Apple ID
+signing is limited by Apple, typically expiring after seven days, and recent
+iOS versions may require Developer Mode for development-signed apps. A paid
+Apple Developer membership is only needed for longer-lived TestFlight/App
+Store distribution.
 
 | | |
 |---|---|
