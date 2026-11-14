@@ -56,7 +56,7 @@ struct QuickPicksGrid: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: rows, spacing: 12) {
-                    ForEach(indexedItems) { indexedItem in
+                    ForEach(indexedItems, id: \.index) { indexedItem in
                         let index = indexedItem.index
                         let item = indexedItem.item
                         let track = item.asTrack
