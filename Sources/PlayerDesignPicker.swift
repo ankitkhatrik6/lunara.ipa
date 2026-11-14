@@ -1,0 +1,727 @@
+import SwiftUI
+import UIKit
+
+struct PlayerDesignPicker: View {
+    @ObservedObject var player: Player
+    @AppStorage("playerDesign") private var activeID = PlayerDesign.classic.rawValue
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var current: PlayerDesign?
+
+    private var currentDesign: PlayerDesign { current ?? .classic }
+    private var applied: Bool { currentDesign.rawValue == activeID }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            topBar
+            carousel
+
+            Text(currentDesign.title)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(.top, 14)
+                .padding(.bottom, 2)
+
+            HStack(spacing: 6) {
+                ForEach(PlayerDesign.allCases) { d in
+                    let on = d == currentDesign
+                    Circle()
+                        .fill(on ? player.artColor : Color.white.opacity(0.35))
+                        .frame(width: on ? 8 : 6, height: on ? 8 : 6)
+                }
+            }
+            .padding(.top, 10)
+
+            applyButton
+
+            if player.hasTrack {
+                MiniPlayerView(player: player) { dismiss() }
+                    .padding(.bottom, 8)
+            }
+        }
+        .background(Lunara.scaffold.ignoresSafeArea())
+        .preferredColorScheme(.dark)
+        .onAppear {
+            current = PlayerDesign(rawValue: activeID) ?? .classic
+            if let track = player.current,
+               Reachability.shared.isUnmetered || PlaybackPrefs.shared.videoOnMobile {
+                let height = Reachability.shared.isUnmetered ? 480 : 360
+                Task {
+                    guard let found = await SongVideos.shared.forSong(track, maxHeight: height) else { return }
+                    await MainActor.run { VideoArtPlayers.shared.prepare(found) }
+                }
+            }
+        }
+    }
+
+    private var topBar: some View {
+        HStack(spacing: 4) {
+            Button { dismiss() } label: {
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+            }
+            Text("Player theme")
+                .font(.system(size: 21, weight: .semibold))
+                .foregroundStyle(.white)
+            Spacer()
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private var carousel: some View {
+        GeometryReader { geo in
+            let pageWidth = geo.size.width - 124
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 16) {
+                    ForEach(PlayerDesign.allCases) { design in
+                        let focused = design == currentDesign
+                        PhoneFrame {
+                            DesignLivePreview(design: design, player: player)
+                        }
+                        .frame(height: geo.size.height * (focused ? 0.90 : 0.78))
+                        .frame(width: pageWidth, height: geo.size.height)
+                        .id(design)
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $current)
+            .scrollIndicators(.hidden)
+            .contentMargins(.horizontal, 62, for: .scrollContent)
+            .scrollClipDisabled()
+        }
+        .padding(.vertical, 26)
+    }
+
+    private var applyButton: some View {
+        Button {
+            activeID = currentDesign.rawValue
+            dismiss()
+        } label: {
+            HStack(spacing: 8) {
+                if applied {
+                    Image(systemName: "checkmark").font(.system(size: 16, weight: .bold))
+                    Text("Using")
+                } else {
+                    Text("Apply")
+                }
+            }
+            .font(.system(size: 16, weight: .heavy))
+            .foregroundStyle(applied ? .white.opacity(0.6) : .white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(applied ? AnyShapeStyle(Color.white.opacity(0.12))
+                                : AnyShapeStyle(player.artColor))
+            .clipShape(Capsule())
+        }
+        .disabled(applied)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+    }
+}
+
+// MARK: - Phone frame
+
+struct PhoneFrame<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        GeometryReader { g in
+            content()
+                .frame(width: g.size.width, height: g.size.height)
+                .clipShape(RoundedRectangle(cornerRadius: 33, style: .continuous))
+        }
+            .overlay(alignment: .top) {
+                Capsule()
+                    .fill(.black)
+                    .frame(width: 46, height: 13)
+                    .padding(.top, 8)
+            }
+            .padding(7)
+            .background(
+                RoundedRectangle(cornerRadius: 40, style: .continuous)
+                    .fill(LinearGradient(
+                        colors: [Color(hex: 0x44454A), Color(hex: 0x26272B), Color(hex: 0x1A1B1E)],
+                        startPoint: .top, endPoint: .bottom)),
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 40, style: .continuous)
+                    .strokeBorder(LinearGradient(
+                        colors: [.white.opacity(0.45), .white.opacity(0.10), .white.opacity(0.28)],
+                        startPoint: .top, endPoint: .bottom), lineWidth: 1.5),
+            )
+            .aspectRatio(9.0 / 19.3, contentMode: .fit)
+            .shadow(color: .white.opacity(0.22), radius: 18)
+    }
+}
+
+// MARK: - Live preview
+
+struct DesignLivePreview: View {
+    let design: PlayerDesign
+    @ObservedObject var player: Player
+
+    var body: some View {
+        ZStack {
+            if design != .fullArt {
+                LinearGradient(colors: [player.artColor, player.artColor.opacity(0.45), .black],
+                               startPoint: .top, endPoint: .bottom)
+            }
+            switch design {
+            case .classic: ClassicPreview(player: player)
+            case .ring: RingPreview(player: player)
+            case .record: RecordPreview(player: player)
+            case .cassette: CassettePreview(player: player)
+            case .fullArt: FullArtPreview(player: player)
+            case .video: VideoArtPreview(player: player)
+            }
+        }
+    }
+}
+
+// MARK: - Shared preview parts
+
+private struct PreviewTitle: View {
+    @ObservedObject var player: Player
+    var shadow = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(player.current?.title ?? "Song title")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.white).lineLimit(1)
+            Text(player.current?.artist ?? "Artist")
+                .font(.system(size: 10))
+                .foregroundStyle(.white.opacity(0.75)).lineLimit(1)
+        }
+        .shadow(color: shadow ? .black.opacity(0.75) : .clear, radius: 3, y: 2)
+    }
+}
+
+private struct PreviewPill: View {
+    let icon: String
+    let bg: Color
+    let tint: Color
+
+    var body: some View {
+        Image(systemName: icon)
+            .font(.system(size: 12))
+            .foregroundStyle(tint)
+            .frame(width: 26, height: 26)
+            .background(bg)
+            .clipShape(Circle())
+    }
+}
+
+private struct PreviewSlider: View {
+    @ObservedObject var player: Player
+    var inactiveAlpha: Double = 0.22
+    @ObservedObject private var look = LookFeel.shared
+    @ObservedObject private var clock: PlaybackClock
+
+    init(player: Player, inactiveAlpha: Double = 0.22) {
+        self.player = player
+        self.inactiveAlpha = inactiveAlpha
+        _clock = ObservedObject(wrappedValue: player.clock)
+    }
+
+    var body: some View {
+        VStack(spacing: 3) {
+            GeometryReader { g in
+                Group {
+                    switch look.sliderStyle {
+                    case .slim:
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(.white.opacity(inactiveAlpha)).frame(height: 6)
+                            Capsule().fill(player.artColor)
+                                .frame(width: max(g.size.width * player.progress, 6), height: 6)
+                        }
+                    case .capsule:
+                        CapsuleTrack(fraction: player.progress, active: player.artColor,
+                                     label: capsuleLabel, compact: true)
+                    case .wavy:
+                        WavyTrack(fraction: player.progress, active: player.artColor,
+                                  squiggly: look.squigglySlider, isPlaying: player.isPlaying, compact: true)
+                    }
+                }
+                .frame(maxHeight: .infinity, alignment: .center)
+                .contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance: 0).onEnded { v in
+                    player.seek(to: min(max(v.location.x / g.size.width, 0), 1))
+                })
+            }
+            .frame(height: 16)
+
+            HStack {
+                Text(timeString(player.currentTime))
+                Spacer()
+                Text(player.duration > 0 ? timeString(player.duration) : "0:00")
+            }
+            .font(.system(size: 9))
+            .foregroundStyle(.white.opacity(0.8))
+        }
+    }
+
+    private var capsuleLabel: String {
+        guard player.duration > 0 else { return "0:00 / 0:00" }
+        return "\(timeString(player.currentTime)) / \(timeString(player.duration))"
+    }
+}
+
+private struct PreviewTransport: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        HStack {
+            Spacer()
+            Image(systemName: "shuffle").font(.system(size: 14)).foregroundStyle(.white)
+            Spacer()
+            Button { player.prev() } label: {
+                Image(systemName: "backward.end.fill").font(.system(size: 17)).foregroundStyle(.white)
+            }
+            Spacer()
+            Button { player.toggle() } label: {
+                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 17))
+                    .foregroundStyle(.white)
+                    .frame(width: 46, height: 46)
+                    .background(player.artColor)
+                    .clipShape(Circle())
+            }
+            Spacer()
+            Button { player.next() } label: {
+                Image(systemName: "forward.end.fill").font(.system(size: 17)).foregroundStyle(.white)
+            }
+            Spacer()
+            Image(systemName: "repeat").font(.system(size: 14)).foregroundStyle(.white)
+            Spacer()
+        }
+    }
+}
+
+private struct PreviewFavorite: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        Button { player.toggleFavorite() } label: {
+            Image(systemName: player.isCurrentFavorite ? "heart.fill" : "heart")
+                .font(.system(size: 15))
+                .foregroundStyle(player.isCurrentFavorite ? .red : .white)
+        }
+    }
+}
+
+private struct PreviewQueuePeek: View {
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach([("list.bullet", "Queue"), ("airplayaudio", "AirPlay"),
+                     ("moon.zzz", "Sleep timer"), ("text.alignleft", "Lyrics")], id: \.0) { icon, label in
+                VStack(spacing: 2) {
+                    Image(systemName: icon).font(.system(size: 11))
+                    Text(label).font(.system(size: 8)).lineLimit(1)
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.top, 4)
+    }
+}
+
+private struct PreviewMetaRow: View {
+    @ObservedObject var player: Player
+    var pillAlpha: Double = 0.14
+    var shadow = false
+
+    var body: some View {
+        HStack(spacing: 0) {
+            PreviewTitle(player: player, shadow: shadow)
+            Spacer(minLength: 6)
+            PreviewFavorite(player: player)
+            Spacer().frame(width: 10)
+            PreviewPill(icon: "paintpalette", bg: .white.opacity(pillAlpha), tint: .white)
+            Spacer().frame(width: 8)
+            PreviewPill(icon: "ellipsis", bg: .white.opacity(pillAlpha), tint: .white)
+        }
+    }
+}
+
+// MARK: - Per-design previews
+
+private struct ClassicPreview: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("Now Playing").font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
+            Spacer()
+            GeometryReader { g in
+                RemoteImage(url: player.current?.artURL(size: 480)) { ArtPlaceholder() }
+                    .frame(width: g.size.width * 0.82, height: g.size.width * 0.82)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .frame(width: g.size.width, alignment: .center)
+            }
+            .aspectRatio(1.22, contentMode: .fit)
+            Spacer().frame(height: 16)
+            PreviewMetaRow(player: player)
+            Spacer().frame(height: 12)
+            PreviewSlider(player: player)
+            Spacer()
+            PreviewTransport(player: player)
+            Spacer()
+            PreviewQueuePeek()
+        }
+        .padding(16)
+        .padding(.top, 20)
+    }
+}
+
+private struct RingPreview: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("Now Playing")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+
+            Spacer()
+            GeometryReader { g in
+                let side = g.size.width * 0.66
+                SeekableAlbumRing(
+                    artURL: player.current?.artURL(size: 480),
+                    progress: player.progress,
+                    ringColor: player.artColor,
+                    trackColor: .white.opacity(0.20),
+                    thumbColor: player.artColor,
+                    stroke: 5, artPadding: 9,
+                    topLabel: AnyView(
+                        HStack(spacing: 3) {
+                            Text(timeString(player.progress * player.duration))
+                                .foregroundStyle(player.artColor)
+                            Text("—").foregroundStyle(.white.opacity(0.5))
+                            Text(player.duration > 0 ? timeString(player.duration) : "--:--")
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                        .font(.system(size: 8, weight: .semibold))
+                        .fixedSize(),
+                    ),
+                ) { player.seek(to: $0) }
+                .frame(width: side, height: side)
+                .frame(width: g.size.width, height: g.size.height, alignment: .center)
+            }
+            .aspectRatio(1.4, contentMode: .fit)
+            Spacer()
+
+            HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(player.current?.title ?? "")
+                        .font(.system(size: 11, weight: .bold)).lineLimit(1)
+                    Text(player.current?.artist ?? "")
+                        .font(.system(size: 9)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                PreviewFavorite(player: player)
+                Image(systemName: "paintpalette").font(.system(size: 13))
+                Image(systemName: "ellipsis").font(.system(size: 13))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 4)
+
+            Spacer().frame(height: 8)
+            PreviewTransport(player: player)
+            Spacer().frame(height: 8)
+
+            VStack(spacing: 2) {
+                Text("In the stillness of the night")
+                    .font(.system(size: 9)).foregroundStyle(.white.opacity(0.45)).lineLimit(1)
+                Text("I feel the weight, the empty sight")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(player.artColor).lineLimit(1)
+                Text("Whispers in my mind, they call")
+                    .font(.system(size: 9)).foregroundStyle(.white.opacity(0.45)).lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+
+            Spacer().frame(height: 6)
+            PreviewQueuePeek()
+            Spacer().frame(height: 6)
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 34)
+    }
+}
+
+private struct RecordPreview: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("Now Playing").font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
+            Spacer()
+            GeometryReader { g in
+                VinylTurntableView(
+                    artURL: player.current?.artURL(size: 480),
+                    isPlaying: player.isPlaying,
+                    progress: player.progress,
+                    fallback: Lunara.gradient,
+                )
+                .frame(width: g.size.width * 0.94, height: g.size.width * 0.94)
+                .frame(width: g.size.width, alignment: .center)
+            }
+            .aspectRatio(1.05, contentMode: .fit)
+            Spacer()
+            PreviewMetaRow(player: player)
+            Spacer().frame(height: 12)
+            PreviewSlider(player: player)
+            Spacer().frame(height: 10)
+            PreviewTransport(player: player)
+            Spacer().frame(height: 10)
+            PreviewQueuePeek()
+        }
+        .padding(16)
+        .padding(.top, 20)
+    }
+}
+
+private struct CassettePreview: View {
+    @ObservedObject var player: Player
+
+    private let cream = Color(hex: 0xF2E7D0)
+    private let ink = Color(hex: 0x3A2F24)
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("Now Playing").font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
+            Spacer()
+            CassetteTapeView(
+                isPlaying: player.isPlaying,
+                progress: player.progress,
+                accent: player.artColor,
+                artURL: player.current?.artURL(size: 300),
+            )
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 6)
+            Spacer()
+
+            HStack(spacing: 4) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(player.current?.title ?? "Song title")
+                        .font(.system(size: 12, weight: .bold)).foregroundStyle(.white).lineLimit(1)
+                    Text(player.current?.artist ?? "Artist")
+                        .font(.system(size: 9)).foregroundStyle(.white.opacity(0.75)).lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                titleKey("heart")
+                titleKey("paintpalette")
+                titleKey("ellipsis")
+            }
+
+            Spacer().frame(height: 8)
+
+            VStack(spacing: 0) {
+                Canvas { ctx, size in
+                    let n = 24
+                    let gap = size.width / CGFloat(n)
+                    let barW = gap * 0.55
+                    for i in 0..<n {
+                        let wave = abs(sin(Double(i) * 1.7) * 0.5 + sin(Double(i) * 0.53 + 1.3) * 0.5)
+                        let barH = size.height * min(max(0.30 + 0.65 * CGFloat(wave), 0.15), 1)
+                        let played = (Double(i) + 0.5) / Double(n) <= player.progress
+                        ctx.fill(
+                            Path(roundedRect: CGRect(x: gap * CGFloat(i) + (gap - barW) / 2,
+                                                     y: (size.height - barH) / 2,
+                                                     width: barW, height: barH),
+                                 cornerRadius: barW / 2),
+                            with: .color(played ? player.artColor : ink.opacity(0.25)))
+                    }
+                }
+                .frame(height: 22)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(cream)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            Spacer().frame(height: 10)
+
+            HStack(spacing: 8) {
+                key(width: 44, bg: cream) {
+                    Image(systemName: "backward.end.fill").font(.system(size: 14)).foregroundStyle(ink)
+                }
+                key(width: 52, height: 38, bg: player.artColor) {
+                    Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                        .font(.system(size: 15)).foregroundStyle(.white)
+                }
+                key(width: 44, bg: cream) {
+                    Image(systemName: "forward.end.fill").font(.system(size: 14)).foregroundStyle(ink)
+                }
+            }
+
+            Spacer().frame(height: 10)
+
+            HStack(spacing: 0) {
+                segment("list.bullet", "Queue", tint: ink)
+                segment("airplayaudio", "AirPlay", tint: ink)
+                segment("moon.zzz", "Sleep", tint: ink)
+                segment("text.alignleft", "Lyrics", tint: player.artColor)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .padding(16)
+        .padding(.top, 20)
+    }
+
+    private func key<C: View>(width: CGFloat, height: CGFloat = 34, bg: Color,
+                              @ViewBuilder content: () -> C) -> some View {
+        content()
+            .frame(width: width, height: height)
+            .background(bg)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func segment(_ icon: String, _ label: String, tint: Color) -> some View {
+        VStack(spacing: 2) {
+            Image(systemName: icon).font(.system(size: 11))
+            Text(label).font(.system(size: 8, weight: .medium)).lineLimit(1)
+        }
+        .foregroundStyle(tint)
+        .frame(maxWidth: .infinity)
+        .frame(height: 36)
+        .background(cream)
+    }
+
+    private func titleKey(_ icon: String) -> some View {
+        Image(systemName: icon)
+            .font(.system(size: 11))
+            .foregroundStyle(ink)
+            .frame(width: 26, height: 22)
+            .background(cream)
+            .clipShape(RoundedRectangle(cornerRadius: 7))
+    }
+}
+
+private struct PreviewCover: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        if let image = player.artworkImage {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+        } else {
+            RemoteImage(url: player.current?.artURL(size: 720)) { Color.black }
+        }
+    }
+}
+
+private struct VideoArtPreview: View {
+    @ObservedObject var player: Player
+    @StateObject private var videoLoader = SongVideoLoader()
+    @State private var showing = false
+
+    var body: some View {
+        ZStack {
+            GeometryReader { g in
+                ZStack {
+                    PreviewCover(player: player)
+                        .frame(width: g.size.width, height: g.size.height)
+                        .clipped()
+
+                    if let v = videoLoader.video {
+                        VideoArtView(video: v,
+                                     position: player.currentTime,
+                                     isPlaying: player.isPlaying,
+                                     songLength: player.duration,
+                                     onFirstFrame: { showing = true })
+                            .frame(width: g.size.width, height: g.size.height)
+                            .clipped()
+                            .opacity(showing ? 1 : 0)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.5), value: showing)
+            }
+
+            LinearGradient(stops: [
+                .init(color: .clear, location: 0.0),
+                .init(color: .clear, location: 0.30),
+                .init(color: .black.opacity(0.85), location: 0.55),
+                .init(color: .black, location: 0.66),
+                .init(color: .black, location: 1.0),
+            ], startPoint: .top, endPoint: .bottom)
+
+            VStack(spacing: 0) {
+                Text("Now Playing")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.75), radius: 3, y: 2)
+                Spacer()
+                PreviewMetaRow(player: player, shadow: true)
+                Spacer().frame(height: 10)
+                PreviewSlider(player: player, inactiveAlpha: 0.25)
+                Spacer().frame(height: 10)
+                PreviewTransport(player: player)
+                Spacer().frame(height: 12)
+                PreviewQueuePeek()
+                Spacer().frame(height: 6)
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 34)
+        }
+        .task(id: player.current?.videoId) { loadVideo() }
+        .onChange(of: player.current?.videoId) { showing = false }
+        .onAppear { loadVideo() }
+    }
+
+    private func loadVideo() {
+        let allowed = Reachability.shared.isUnmetered || PlaybackPrefs.shared.videoOnMobile
+        let height = Reachability.shared.isUnmetered ? 480 : 360
+        videoLoader.load(for: player.current, allowed: allowed, maxHeight: height)
+    }
+}
+
+private struct FullArtPreview: View {
+    @ObservedObject var player: Player
+
+    var body: some View {
+        ZStack {
+            GeometryReader { g in
+                PreviewCover(player: player)
+                    .frame(width: g.size.width, height: g.size.height)
+                    .clipped()
+            }
+
+            LinearGradient(stops: [
+                .init(color: .black.opacity(0.30), location: 0.0),
+                .init(color: .clear, location: 0.35),
+                .init(color: .black.opacity(0.55), location: 0.65),
+                .init(color: .black.opacity(0.92), location: 1.0),
+            ], startPoint: .top, endPoint: .bottom)
+
+            VStack {
+                Text("Now Playing")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.75), radius: 3, y: 2)
+                    .padding(.top, 30)
+                Spacer()
+            }
+
+            VStack(spacing: 0) {
+                Spacer()
+                PreviewMetaRow(player: player, pillAlpha: 0.18, shadow: true)
+                Spacer().frame(height: 10)
+                PreviewSlider(player: player, inactiveAlpha: 0.25)
+                Spacer().frame(height: 10)
+                PreviewTransport(player: player)
+                Spacer().frame(height: 12)
+                PreviewQueuePeek()
+            }
+            .padding(16)
+        }
+    }
+}

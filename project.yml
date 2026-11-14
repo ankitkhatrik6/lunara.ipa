@@ -1,0 +1,82 @@
+# XcodeGen spec. There is no Mac here to create an .xcodeproj by hand, so
+# Codemagic runs `xcodegen generate` on its cloud Mac to build this file into a
+# real project before compiling. Edit this, never the generated .xcodeproj.
+name: LunaraPlayer
+options:
+  bundleIdPrefix: com.lunara
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+targets:
+  LunaraPlayer:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      # The .lproj folders must go in as folder references, or Xcode flattens
+      # them and every language resolves to the same file.
+      - path: Sources/en.lproj
+        type: folder
+      - path: Sources/ne.lproj
+        type: folder
+      - path: Sources/hi.lproj
+        type: folder
+    dependencies:
+      - target: LunaraWidget
+        embed: true
+    info:
+      path: Sources/Generated-Info.plist
+      properties:
+        CFBundleDisplayName: Lunara
+        CFBundleShortVersionString: "0.4.0"
+        CFBundleVersion: "4"
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, ne, hi]
+        # The one line that lets a music player keep going with the screen locked.
+        UIBackgroundModes:
+          - audio
+        CFBundleURLTypes:
+          - CFBundleURLName: com.lunara.player
+            CFBundleURLSchemes:
+              - lunara
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lunara.player
+        MARKETING_VERSION: "0.4.0"
+        CURRENT_PROJECT_VERSION: "4"
+        TARGETED_DEVICE_FAMILY: "1"   # iPhone only
+        GENERATE_INFOPLIST_FILE: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  LunaraWidget:
+    type: app-extension
+    platform: iOS
+    # Only the link definitions are shared, so the widget and the app can't
+    # drift on URLs. The intents themselves stay in the app — compiling them
+    # here too would register every App Intent twice.
+    sources:
+      - Widget
+      - path: Sources/LunaraLink.swift
+      - path: Sources/Resources/lunara_logo_white.png
+        buildPhase: resources
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Lunara
+        CFBundleShortVersionString: "0.4.0"
+        CFBundleVersion: "4"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lunara.player.widget
+        MARKETING_VERSION: "0.4.0"
+        CURRENT_PROJECT_VERSION: "4"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        SKIP_INSTALL: YES

@@ -1,0 +1,7 @@
+LunaraPlayer.xcodeproj/
+Sources/Generated-Info.plist
+build/
+DerivedData/
+*.ipa
+Payload/
+.DS_Store
