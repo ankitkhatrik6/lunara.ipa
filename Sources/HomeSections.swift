@@ -35,16 +35,6 @@ struct QuickPicksGrid: View {
 
     private let rows = Array(repeating: GridItem(.fixed(56), spacing: 8), count: 4)
 
-    private struct IndexedItem: Identifiable {
-        let index: Int
-        let item: HomeItem
-        var id: Int { index }
-    }
-
-    private var indexedItems: [IndexedItem] {
-        section.items.enumerated().map { IndexedItem(index: $0.offset, item: $0.element) }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HomeSectionHeader(
@@ -56,9 +46,8 @@ struct QuickPicksGrid: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: rows, spacing: 12) {
-                    ForEach(indexedItems, id: \QuickPicksGrid.IndexedItem.index, content: { indexedItem in
-                        let index = indexedItem.index
-                        let item = indexedItem.item
+                    ForEach(0..<section.items.count) { index in
+                        let item = section.items[index]
                         let track = item.asTrack
                         HStack(spacing: 4) {
                             Button {
@@ -71,7 +60,7 @@ struct QuickPicksGrid: View {
                             SongRowMenu(track: track, player: player, trailingPadding: 2)
                         }
                         .frame(width: 280, alignment: .leading)
-                    })
+                    }
                 }
                 .padding(.horizontal, 16)
             }
