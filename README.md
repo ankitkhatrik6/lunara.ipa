@@ -1,29 +1,29 @@
 <div align="center">
 
-# Lunara for Android
+# Lunara for iOS
 
 <img src="logo.png" alt="Lunara logo" width="120" height="120" />
 
-### A free and open source music player for Android
+### A modern music player built in SwiftUI
 
-Stream the YouTube Music catalogue, play it through Media3, and follow
-time-synced lyrics. No advertisements, no tracking, no account required.
+Stream, download, and play local audio with word-by-word synced lyrics
+and a multi-band equalizer.
 
 <br />
 
-[![Platform](https://img.shields.io/badge/Platform-Android-27CE65?style=flat-square&logo=android&logoColor=27CE65&labelColor=000000)](#installation)
-[![Kotlin](https://img.shields.io/badge/Language-Kotlin-27CE65?style=flat-square&logo=kotlin&logoColor=27CE65&labelColor=000000)](#technology)
-[![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack_Compose-27CE65?style=flat-square&logo=jetpackcompose&logoColor=27CE65&labelColor=000000)](#technology)
-[![Media3](https://img.shields.io/badge/Audio-Media3-27CE65?style=flat-square&logo=android&logoColor=27CE65&labelColor=000000)](#technology)
-[![Gradle](https://img.shields.io/badge/Build-Gradle-27CE65?style=flat-square&logo=gradle&logoColor=27CE65&labelColor=000000)](#building)
+[![Platform](https://img.shields.io/badge/Platform-iOS_17%2B-27CE65?style=flat-square&logo=apple&logoColor=27CE65&labelColor=000000)](#building)
+[![Swift](https://img.shields.io/badge/Language-Swift-27CE65?style=flat-square&logo=swift&logoColor=27CE65&labelColor=000000)](#technology)
+[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-27CE65?style=flat-square&logo=swift&logoColor=27CE65&labelColor=000000)](#technology)
+[![XcodeGen](https://img.shields.io/badge/Project-XcodeGen-27CE65?style=flat-square&logo=xcode&logoColor=27CE65&labelColor=000000)](project.yml)
 [![License](https://img.shields.io/badge/License-GPL--3.0-27CE65?style=flat-square&logo=gnu&logoColor=27CE65&labelColor=000000)](LICENSE)
 
-[![Android Build](https://img.shields.io/badge/CI-Android_Release-27CE65?style=flat-square&logo=githubactions&logoColor=27CE65&labelColor=000000)](https://github.com/ankitkhatrik6/Lunara/actions/workflows/android-release.yml)
-[![Releases](https://img.shields.io/badge/Releases-lunara--releases-27CE65?style=flat-square&logo=github&logoColor=27CE65&labelColor=000000)](https://github.com/ankitkhatrik6/lunara-releases/releases)
+[![Codemagic](https://img.shields.io/badge/CI-Codemagic-27CE65?style=flat-square&logo=codemagic&logoColor=27CE65&labelColor=000000)](codemagic.yaml)
+[![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-27CE65?style=flat-square&logo=githubactions&logoColor=27CE65&labelColor=000000)](.github/workflows/release-ipa.yml)
+[![Distribution](https://img.shields.io/badge/Distribution-TestFlight_|_Sideload-27CE65?style=flat-square&logo=testflight&logoColor=27CE65&labelColor=000000)](#distribution)
 
 <br />
 
-[Overview](#overview) &nbsp;|&nbsp; [Features](#features) &nbsp;|&nbsp; [Installation](#installation) &nbsp;|&nbsp; [Architecture](#architecture) &nbsp;|&nbsp; [Building](#building) &nbsp;|&nbsp; [Troubleshooting](#troubleshooting)
+[Overview](#overview) &nbsp;|&nbsp; [Features](#features) &nbsp;|&nbsp; [Building](#building) &nbsp;|&nbsp; [Distribution](#distribution) &nbsp;|&nbsp; [Technology](#technology)
 
 </div>
 
@@ -33,12 +33,9 @@ time-synced lyrics. No advertisements, no tracking, no account required.
 
 - [Overview](#overview)
 - [Features](#features)
-- [Installation](#installation)
-- [Architecture](#architecture)
-- [Technology](#technology)
 - [Building](#building)
-- [Continuous Integration](#continuous-integration)
-- [Troubleshooting](#troubleshooting)
+- [Distribution](#distribution)
+- [Technology](#technology)
 - [License](#license)
 - [Author](#author)
 
@@ -46,134 +43,112 @@ time-synced lyrics. No advertisements, no tracking, no account required.
 
 ## Overview
 
-Lunara is a free and open source music player for Android. It streams the YouTube Music catalogue through the InnerTube API, plays audio with the AndroidX Media3 engine, and displays time-synced lyrics. There are no advertisements, no tracking, and no account required.
+Lunara streams music seamlessly, plays local audio files on your phone, and tracks synced lyrics with word-by-word highlighting.
 
 ## Features
 
+### Playback and Audio
+
 | Feature | Description |
 |---------|-------------|
-| **YouTube Music catalogue** | Search, live suggestions, browse, artists, albums, and playlists through the InnerTube `WEB_REMIX` client. |
-| **Reliable playback** | The playable audio stream is resolved per track against the InnerTube player endpoint using several public client identities. Playback runs through Media3 with lock screen and notification controls. |
-| **Synced lyrics** | Time-synced and plain lyrics with a priority chain of providers: Paxsenix, LRCLIB, Better Lyrics, KuGou, and LyricsPlus. |
-| **Queue management** | Play next, add to queue, reorder, remove, and clear. |
-| **Mini player and full player** | Scrubbable seek bar, repeat (all, one, off), shuffle, and a sleep timer. |
-| **Spotify import** | Paste a public playlist link and Lunara matches the tracks into an offline-ready playlist. |
-| **Offline downloads** | Save high-bitrate audio locally for offline playback. |
-| **Local device music** | The MediaStore scanner integrates files already on the device. |
-| **Local persistence** | Liked songs, playlists, search history, profile, and listening statistics are stored on device with Room. |
-| **Personalised home** | Time-based greeting, listening history, trending, popular albums, recommended playlists, and a local Top 20. |
+| **Streaming** | Search and browse songs, albums, artists, mood stations, and playlists. |
+| **Local music** | Import audio from Files and play it alongside streamed tracks. |
+| **Downloads and audio cache** | Keep songs offline and cache streamed playback automatically. |
+| **Queue** | Reorder tracks, save the queue as a playlist, or launch radio from any track. |
+| **Equalizer** | Multi-band DSP equalizer with presets. |
+| **Background audio and lock screen** | Full media controls, sleep timer, and AirPlay support. |
+| **Stream sources** | Select preferred playback stream clients and audio quality. |
 
-## Installation
+### Lyrics
 
-Download the latest signed APK from the [Releases](https://github.com/ankitkhatrik6/lunara-releases/releases) page and install it.
+| Feature | Description |
+|---------|-------------|
+| **Synced lyrics** | Word-by-word highlighting and TTML timing support. |
+| **Romanization and AI translation** | Optional script romanization and translations. |
+| **Lyrics cache** | Cached locally for offline reading. |
+
+### Library and Extras
+
+| Feature | Description |
+|---------|-------------|
+| **Local library and playlists** | Create and manage playlists, liked songs, and favorite artists on device. |
+| **Import from Spotify** | Match public Spotify playlists track by track into local playlists. |
+| **Share playlists and tracks** | Shareable artwork cards with scannable links. |
+| **Home Screen widget and Siri Intents** | Quick playback widget and voice shortcuts. |
+
+## Building
+
+The Xcode project is generated with [XcodeGen](https://github.com/yonaskolb/XcodeGen) from [`project.yml`](project.yml).
+
+```bash
+brew install xcodegen
+xcodegen generate
+open LunaraPlayer.xcodeproj
+```
+
+### Project details
+
+| Property | Value |
+|----------|-------|
+| **Language** | Swift |
+| **UI** | SwiftUI |
+| **Minimum OS** | iOS 17.0 |
+| **Project generation** | XcodeGen from `project.yml` |
+| **Bundle ID** | `com.lunara.player` |
+| **Build output** | `LunaraPlayer.ipa` |
+
+## Distribution
+
+Two build pipelines are provided. Choose based on whether you have an Apple Developer membership.
+
+### Option 1: Codemagic (signed, App Store)
+
+[`codemagic.yaml`](codemagic.yaml) defines the `ios-release` workflow, which creates an App Store-signed IPA.
+
+1. Create an `app_store_credentials` environment group.
+2. Add an App Store Connect API key and signing access to it.
+3. Run the `ios-release` workflow.
+
+The resulting build can be distributed through TestFlight or the App Store.
 
 > [!NOTE]
-> If you previously installed an earlier or unofficial build of Lunara, uninstall it once before installing the latest release. See [Troubleshooting](#troubleshooting) for details.
+> An IPA alone cannot be installed on arbitrary iPhones without Apple distribution or TestFlight.
 
-## Architecture
+### Option 2: GitHub Actions (unsigned, free)
 
-The project is a multi-module Gradle build. The `app` module contains the application and UI, and the remaining modules provide the data sources it depends on.
+[`release-ipa.yml`](.github/workflows/release-ipa.yml) builds entirely on GitHub-hosted runners and needs no Apple Developer secrets.
 
-| Module | Purpose |
-|--------|---------|
-| `app` | Application entry point, Compose UI, playback service, database, and downloads. |
-| `innertube` | YouTube Music InnerTube client and stream resolution. |
-| `lrclib` | LRCLIB lyrics provider. |
-| `paxsenix` | Paxsenix lyrics provider. |
-| `betterlyrics` | Better Lyrics provider. |
-| `kugou` | KuGou lyrics provider. |
-| `shazamkit` | ShazamKit integration. |
+1. Open **Actions > Build and Release Unsigned IPA > Run workflow**.
+2. Provide the version and build number.
+3. The workflow generates the Xcode project on a macOS runner, packages an unsigned IPA, and attaches it to a GitHub Release.
 
-Supporting directories:
+### Installing the unsigned IPA
 
-| Directory | Purpose |
-|-----------|---------|
-| `.github/workflows` | CI workflows for Android and iOS releases. |
-| `fastlane/metadata/android` | Store listing metadata. |
-| `scripts`, `tools` | Build and maintenance helpers. |
-| `site` | Project website. |
+An unsigned IPA cannot be installed directly on an iPhone. For personal free use, download the release IPA and sign it with your own Apple ID using a sideloading tool.
+
+| Tool | Notes |
+|------|-------|
+| **AltStore** | Signs with your Apple ID and refreshes through a companion app. |
+| **SideStore** | On-device sideloading alternative. |
+| **Sideloadly** | Desktop-based signing and installation. |
+
+> [!IMPORTANT]
+> Free Apple ID signing is limited by Apple and typically expires after seven days. Recent iOS versions may require Developer Mode for development-signed apps. A paid Apple Developer membership is only needed for longer-lived TestFlight or App Store distribution.
 
 ## Technology
 
 | Area | Choice |
 |------|--------|
-| Platform | Android, Kotlin, Jetpack Compose, Material 3 |
-| Audio | AndroidX Media3 (ExoPlayer and MediaSession) with an OkHttp data source |
-| Extraction | In-app InnerTube client (player endpoint with client rotation) |
-| Lyrics | Paxsenix, LRCLIB, Better Lyrics, KuGou, and LyricsPlus |
-| Database | AndroidX Room |
-| Images | Coil |
-| Networking | OkHttp |
-| Build | Gradle (Kotlin DSL), multi-module |
-
-## Building
-
-### Requirements
-
-- JDK 17 or newer
-- Android SDK
-
-### Build commands
-
-```bash
-git clone https://github.com/ankitkhatrik6/Lunara.git
-cd Lunara
-
-# Unit tests
-./gradlew testDebugUnitTest
-
-# Debug build
-./gradlew assembleDebug
-
-# Release build
-./gradlew assembleRelease
-```
-
-### Build outputs
-
-| Build type | Path |
-|------------|------|
-| Debug | `app/build/outputs/apk/debug/app-debug.apk` |
-| Release | `app/build/outputs/apk/release/app-release.apk` |
-
-## Continuous Integration
-
-| Workflow | Platform | Runner |
-|----------|----------|--------|
-| [`android-release.yml`](.github/workflows/android-release.yml) | Android APK (debug and release) | GitHub Actions, Ubuntu, Gradle |
-
-Artifacts are available in the GitHub Actions run summary.
-
-## Troubleshooting
-
-<details>
-<summary><b>"App not installed" or "package conflict"</b></summary>
-
-<br />
-
-This happens when a build is installed over a previous build that has the same package name but a different signing certificate, or when the version code is not increased. To resolve it:
-
-1. Uninstall the previously installed Lunara build.
-2. Install the latest release APK.
-
-Subsequent updates from the same release channel install without conflict.
-
-</details>
-
-<details>
-<summary><b>"Play Protect blocked this app because the developer is unknown"</b></summary>
-
-<br />
-
-Play Protect shows this warning for applications that are not distributed through Google Play. When the warning appears, choose to install anyway, or add Lunara to the allowed list in the Play Store settings under Play Protect.
-
-</details>
+| Language | Swift |
+| UI framework | SwiftUI |
+| Project generation | XcodeGen |
+| Audio | Background playback, multi-band DSP equalizer, AirPlay |
+| Integrations | Siri Intents, Home Screen widget |
+| CI / CD | Codemagic, GitHub Actions |
 
 ## License
 
-Lunara is released under the [GNU General Public License v3.0](LICENSE).
-
-Lunara is an independent project. It is not affiliated with, endorsed by, or sponsored by Google LLC, YouTube, or Spotify AB.
+Released under the [GNU General Public License v3.0](LICENSE).
 
 ## Author
 
@@ -187,6 +162,6 @@ Designed and developed by **Ankit**, a BSc CSIT student and full-stack developer
 
 <div align="center">
 
-Built with Kotlin and Jetpack Compose.
+Built with SwiftUI.
 
 </div>
