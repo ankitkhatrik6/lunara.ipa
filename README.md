@@ -2,6 +2,8 @@
 
 # Lunara for iOS
 
+<img src="logo.png" alt="Lunara logo" width="120" height="120" />
+
 ### A modern music player built in SwiftUI
 
 Stream, download, and play local audio with word-by-word synced lyrics
@@ -9,15 +11,14 @@ and a multi-band equalizer.
 
 <br />
 
-[![Platform](https://img.shields.io/badge/Platform-iOS_17%2B-27CE65?style=flat-square&logo=apple&logoColor=white&labelColor=08A858)](#building)
-[![Swift](https://img.shields.io/badge/Language-Swift-27CE65?style=flat-square&logo=swift&logoColor=white&labelColor=08A858)](#technology)
-[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-27CE65?style=flat-square&logo=swift&logoColor=white&labelColor=08A858)](#technology)
-[![XcodeGen](https://img.shields.io/badge/Project-XcodeGen-27CE65?style=flat-square&logo=xcode&logoColor=white&labelColor=08A858)](project.yml)
-[![License](https://img.shields.io/badge/License-GPL--3.0-27CE65?style=flat-square&logo=gnu&logoColor=white&labelColor=08A858)](LICENSE)
-
-[![Codemagic](https://img.shields.io/badge/CI-Codemagic-27CE65?style=flat-square&logo=codemagic&logoColor=white&labelColor=08A858)](codemagic.yaml)
-[![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-27CE65?style=flat-square&logo=githubactions&logoColor=white&labelColor=08A858)](.github/workflows/release-ipa.yml)
-[![Distribution](https://img.shields.io/badge/Distribution-TestFlight_|_Sideload-27CE65?style=flat-square&logo=testflight&logoColor=white&labelColor=08A858)](#distribution)
+[![Platform](https://img.shields.io/badge/Platform-iOS_17%2B-27CE65?style=flat-square&logo=apple&logoColor=27CE65&labelColor=000000)](#building)
+[![Swift](https://img.shields.io/badge/Language-Swift-27CE65?style=flat-square&logo=swift&logoColor=27CE65&labelColor=000000)](#technology)
+[![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-27CE65?style=flat-square&logo=swift&logoColor=27CE65&labelColor=000000)](#technology)
+[![XcodeGen](https://img.shields.io/badge/Project-XcodeGen-27CE65?style=flat-square&logo=xcode&logoColor=27CE65&labelColor=000000)](project.yml)
+[![License](https://img.shields.io/badge/License-GPL--3.0-27CE65?style=flat-square&logo=gnu&logoColor=27CE65&labelColor=000000)](LICENSE)
+[![Codemagic](https://img.shields.io/badge/CI-Codemagic-27CE65?style=flat-square&logo=codemagic&logoColor=27CE65&labelColor=000000)](codemagic.yaml)
+[![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-27CE65?style=flat-square&logo=githubactions&logoColor=27CE65&labelColor=000000)](.github/workflows/release-ipa.yml)
+[![Distribution](https://img.shields.io/badge/Distribution-TestFlight_|_Sideload-27CE65?style=flat-square&logo=testflight&logoColor=27CE65&labelColor=000000)](#distribution)
 
 <br />
 
@@ -152,9 +153,9 @@ Released under the [GNU General Public License v3.0](LICENSE).
 
 Designed and developed by **Ankit**, a BSc CSIT student and full-stack developer based in Kathmandu, Nepal.
 
-[![GitHub](https://img.shields.io/badge/GitHub-ankitkhatrik6-27CE65?style=flat-square&logo=github&logoColor=white&labelColor=08A858)](https://github.com/ankitkhatrik6)
-[![Portfolio](https://img.shields.io/badge/Portfolio-ankitkhatri.me-27CE65?style=flat-square&logo=googlechrome&logoColor=white&labelColor=08A858)](https://ankitkhatri.me)
-[![Instagram](https://img.shields.io/badge/Instagram-21ank1t-27CE65?style=flat-square&logo=instagram&logoColor=white&labelColor=08A858)](https://instagram.com/21ank1t)
+[![GitHub](https://img.shields.io/badge/GitHub-ankitkhatrik6-27CE65?style=flat-square&logo=github&logoColor=27CE65&labelColor=000000)](https://github.com/ankitkhatrik6)
+[![Portfolio](https://img.shields.io/badge/Portfolio-ankitkhatri.me-27CE65?style=flat-square&logo=googlechrome&logoColor=27CE65&labelColor=000000)](https://ankitkhatri.me)
+[![Instagram](https://img.shields.io/badge/Instagram-21ank1t-27CE65?style=flat-square&logo=instagram&logoColor=27CE65&labelColor=000000)](https://instagram.com/21ank1t)
 
 ---
 
