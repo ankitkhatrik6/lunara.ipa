@@ -46,8 +46,9 @@ struct QuickPicksGrid: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: rows, spacing: 12) {
-                    ForEach(0..<section.items.count, id: \.self) { index in
-                        let item = section.items[index]
+                    ForEach(Array(section.items.enumerated()), id: \.offset) { pair in
+                        let index = pair.offset
+                        let item = pair.element
                         let track = item.asTrack
                         HStack(spacing: 4) {
                             Button {
