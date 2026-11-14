@@ -37,12 +37,26 @@ struct LunaraLoader: View {
 
     @State private var start = Date()
 
+    private func bar(index: Int, elapsed: TimeInterval, accent: Color) -> some View {
+        let wave = (sin(elapsed * (3.6 + Double(index) * 1.1) + Double(index) * 1.1) + 1) / 2
+        return Capsule()
+            .fill(index == 1 ? Lunara.neonGreen : accent)
+            .frame(
+                width: max(2, size * 0.07),
+                height: max(size * 0.14, size * 0.34 * CGFloat(wave))
+            )
+    }
+
     var body: some View {
         let accent = tint ?? palette.accent
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
             let elapsed = timeline.date.timeIntervalSince(start)
             let angle = (elapsed * 260).truncatingRemainder(dividingBy: 360)
             let ringWidth = max(2.5, size * 0.085)
+            let gradient = AngularGradient(
+                gradient: Gradient(colors: [accent.opacity(0.08), accent, Lunara.neonGreen]),
+                center: .center
+            )
 
             ZStack {
                 Circle()
@@ -53,28 +67,12 @@ struct LunaraLoader: View {
 
                 Circle()
                     .trim(from: 0.06, to: 0.68)
-                    .stroke(
-                        AngularGradient(
-                            gradient: Gradient(colors: [
-                                accent.opacity(0.08),
-                                accent,
-                                Lunara.neonGreen,
-                            ]),
-                            center: .center
-                        ),
-                        style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
-                    )
+                    .stroke(gradient, style: StrokeStyle(lineWidth: ringWidth, lineCap: .round))
                     .rotationEffect(.degrees(angle))
 
                 HStack(alignment: .bottom, spacing: max(1.5, size * 0.055)) {
                     ForEach(0..<3, id: \.self) { index in
-                        let wave = (sin(elapsed * (3.6 + Double(index) * 1.1) + Double(index) * 1.1) + 1) / 2
-                        Capsule()
-                            .fill(index == 1 ? Lunara.neonGreen : accent)
-                            .frame(
-                                width: max(2, size * 0.07),
-                                height: max(size * 0.14, size * 0.34 * CGFloat(wave))
-                            )
+                        bar(index: index, elapsed: elapsed, accent: accent)
                     }
                 }
                 .frame(height: size * 0.36, alignment: .bottom)

@@ -1085,11 +1085,6 @@ final class Player: ObservableObject {
             return
         }
         playWhenReady = false
-        if paused {
-            isPlaying = false
-            updateNowPlaying()
-            return
-        }
         configureSession()
         p.play()
         p.rate = Float(PlaybackPrefs.shared.speed)
