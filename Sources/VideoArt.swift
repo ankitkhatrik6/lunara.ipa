@@ -264,6 +264,7 @@ struct VideoArtView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
+    @MainActor
     final class Coordinator {
         private var player: AVPlayer?
         private var current: SongVideo?
@@ -383,14 +384,14 @@ struct VideoArtView: UIViewRepresentable {
             bandsLook?.cancel()
 
             watchdog?.cancel()
-            watchdog = Task { [weak self, weak view, weak player] in
+            watchdog = Task { @MainActor [weak self, weak view, weak player] in
                 try? await Task.sleep(nanoseconds: (self?.patience ?? 15) * 1_000_000_000)
                 guard !Task.isCancelled, let view, !view.playerLayer.isReadyForDisplay else { return }
                 let item = player?.currentItem
                 VideoArtLog.note("watchdog: no frame after 15s — itemStatus=\(item?.status.rawValue ?? -1) "
                     + "bufferEmpty=\(item?.isPlaybackBufferEmpty ?? false) keepUp=\(item?.isPlaybackLikelyToKeepUp ?? false) "
                     + "loaded=\(item?.loadedTimeRanges.count ?? 0) rate=\(player?.rate ?? -1)")
-                await MainActor.run { self?.onTrouble("The video never started playing") }
+                self?.onTrouble("The video never started playing")
             }
 
             if let endObs { NotificationCenter.default.removeObserver(endObs) }
